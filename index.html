@@ -1,0 +1,203 @@
+<html>
+<head>
+  <title>Twitch Chat Viewer & Rums Alot Minigame</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f0f0f0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: row; /* Arrange children side-by-side */
+      gap: 20px;
+      max-width: 1200px; /* Increased width to accommodate scoreboard */
+      width: 100%;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .chat-section {
+      flex: 2; /* Chat takes more space */
+      display: flex;
+      flex-direction: column;
+    }
+
+    .game-section {
+      flex: 1; /* Game/Scoreboard takes less space */
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    #connect-form {
+      margin-bottom: 20px;
+      display: flex; /* Align input and button */
+      gap: 10px;
+    }
+
+    #channel-input {
+      padding: 8px;
+      font-size: 16px;
+      border: 2px solid #6441A4;
+      border-radius: 4px;
+      flex-grow: 1; /* Input takes available space */
+    }
+
+    #connect-btn {
+      padding: 8px 16px;
+      font-size: 16px;
+      background: #6441A4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      white-space: nowrap; /* Prevent button text wrapping */
+    }
+
+    #connect-btn:hover {
+      background: #7454B3;
+    }
+
+    #chat-box {
+      height: 500px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      background: #fff;
+      flex-grow: 1; /* Chat box fills available vertical space */
+      min-height: 300px; /* Ensure it has some base height */
+    }
+
+    .chat-message {
+      padding: 4px 0;
+      word-wrap: break-word;
+    }
+
+    .username {
+      font-weight: bold;
+      color: #6441A4;
+    }
+
+    .timestamp {
+      color: #666;
+      font-size: 0.8em;
+      margin-right: 5px;
+    }
+
+    .status {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 4px;
+    }
+
+    .status.connected {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status.disconnected {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    #game-log {
+      height: 200px; /* Fixed height for game log */
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 10px;
+      background: #f9f9f9;
+      font-size: 0.9em;
+    }
+
+    .game-event {
+      padding: 3px 0;
+      border-bottom: 1px dashed #eee;
+    }
+    .game-event:last-child {
+      border-bottom: none;
+    }
+
+    #scoreboard {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 10px;
+      background: #f9f9f9;
+      flex-grow: 1; /* Scoreboard fills remaining space */
+      overflow-y: auto; /* Add scroll if needed */
+    }
+
+    #scoreboard h2 {
+        margin-top: 0;
+        margin-bottom: 10px;
+        color: #333;
+        font-size: 1.2em;
+        text-align: center;
+    }
+
+    #score-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    #score-list li {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+        border-bottom: 1px solid #eee;
+    }
+    #score-list li:last-child {
+        border-bottom: none;
+    }
+
+    #score-list .score-name {
+        font-weight: bold;
+        color: #6441A4; /* Use Twitch purple */
+    }
+    #score-list .score-value {
+        font-weight: bold;
+        color: #e67e22; /* Gold/Orange color for score */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="chat-section">
+      <h1>Twitch Chat Viewer</h1>
+      <div id="connect-form">
+        <input type="text" id="channel-input" placeholder="Enter channel name">
+        <button id="connect-btn">Connect</button>
+      </div>
+      <div id="status" class="status"></div>
+      <div id="chat-box"></div>
+    </div>
+
+    <div class="game-section">
+      <h2>Captain Rums Alot's Dig!</h2>
+      <p>Type <code>!dig</code> in chat to search for treasure!</p>
+      <div id="game-log">
+         <div class="game-event">Game events will appear here...</div>
+      </div>
+      <div id="scoreboard">
+        <h2>Scoreboard</h2>
+        <ul id="score-list">
+          <!-- Scores will be populated here -->
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="tmi.js"></script>
+  <script src="chat.js"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
